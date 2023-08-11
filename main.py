@@ -1,8 +1,4 @@
-
-
-def print_hi(name):
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
-
+from classes.Parser import Parser
 
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    Parser('https://github.com/advisories?query=type%3Areviewed+ecosystem%3Ago').convert_json_to_csv()

@@ -99,6 +99,3 @@ class Parser:
             file.write(csv)
 
         return csv
-
-
-Parser('https://github.com/advisories?query=type%3Areviewed+ecosystem%3Ago').convert_json_to_csv()
