@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "github-vuln-parser"
+version = "0.1.0"
+description = ""
+authors = ["Kirill <teamlead.python@gmail.com>"]
+readme = "README.md"
+packages = [{include = "github_vuln_parser"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "*"
+bs4 = "*"
+beautifulsoup4 = "*"
+lxml = "*"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
