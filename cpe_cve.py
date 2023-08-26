@@ -1,11 +1,13 @@
+""" This script will search the NVD database for CVEs that match a given CPE. """
 import requests
 
 
 def get_cves_for_cpe(cpe):
+    """ Search the NVD database for CVEs that match a given CPE. """
     base_url = "https://services.nvd.nist.gov/rest/json/cves/2.0"
     query_url = f"{base_url}?cpeName={cpe}&startIndex=0&resultsPerPage=100"
 
-    response = requests.get(query_url)
+    response = requests.get(query_url, timeout=60)
     if response.status_code == 200:
         data = response.json()
         if "result" in data and "CVE_Items" in data["result"]:
@@ -18,6 +20,7 @@ def get_cves_for_cpe(cpe):
 
 
 def main():
+    """ Main function. """
     cpe_to_search = "cpe:2.3:o:microsoft:windows_server_2012:r2:x64:1607"
     cves = get_cves_for_cpe(cpe_to_search)
 

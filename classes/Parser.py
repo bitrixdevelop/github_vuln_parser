@@ -1,23 +1,29 @@
-import requests
+""" Class Parser for parsing github advisories """
 import json
+import requests
 from bs4 import BeautifulSoup
 
 
 class Parser:
+    """ Class for parsing github advisories """
     def __init__(self, url):
         self.url = url
-        response = requests.get(url)
+        response = requests.get(url, timeout=60)
         self.soup = BeautifulSoup(response.text, "lxml")
         self.pages_total = self.get_count_pages()
 
     def get_count_pages(self):
-        self.pages_total = int(self.soup.find("div", class_="pagination").find_all("a")[-2].text)
+        """ Get count pages """
+        self.pages_total = int(
+            self.soup.find("div", class_="pagination").find_all("a")[-2].text
+        )
         return self.pages_total
 
     def get_advisories(self):
+        """ Get advisories """
         advisories = []
         for page in range(1, self.pages_total + 1):
-            response = requests.get(self.url + f"&page={page}")
+            response = requests.get(self.url + f"&page={page}", timeout=60)
             self.soup = BeautifulSoup(response.text, "lxml")
             advisories_arr = self.soup.find_all("div", class_="Box-row")
             for advisory in advisories_arr:
@@ -30,9 +36,14 @@ class Parser:
                 advisory_title = advisory.find("a", class_="Link--primary")
                 advisory_span = advisory.find("span", class_="Label")
 
-                detail_response = requests.get("https://github.com" + advisory_title.get("href"))
+                detail_response = requests.get(
+                    "https://github.com" + advisory_title.get("href"),
+                    timeout=60
+                )
                 detail_soup = BeautifulSoup(detail_response.text, "lxml")
-                discussion_sidebar = detail_soup.find_all("div", class_="discussion-sidebar-item")
+                discussion_sidebar = detail_soup.find_all(
+                    "div", class_="discussion-sidebar-item"
+                )
                 for sidebar in discussion_sidebar:
                     sidebar_title = sidebar.find("h3")
 
@@ -58,7 +69,9 @@ class Parser:
                     if header_subblocks:
                         package_name = (
                             header_subblocks[0]
-                            .find("span", class_=["f4", "color-fg-default", "text-bold"])
+                            .find(
+                                "span", class_=["f4", "color-fg-default", "text-bold"]
+                            )
                             .text
                         )
                         affected_version_array = header_subblocks[1].find_all(
@@ -97,7 +110,9 @@ class Parser:
                         )
 
                 arr_advisory = {
-                    "title": advisory_title.text.replace("\n                      ", "").strip(),
+                    "title": advisory_title.text.replace(
+                        "\n                      ", ""
+                    ).strip(),
                     "advisory_url": "https://github.com" + advisory_title.get("href"),
                     "severity": advisory_span.text.strip(),
                     "cve_id": cve_id,
@@ -113,14 +128,24 @@ class Parser:
         return json.dumps(advisories, indent=4, ensure_ascii=False)
 
     def convert_json_to_csv(self):
+        """ Convert json to csv """
         advisories = json.loads(self.get_advisories())
-        print(advisories)
-        csv = f"Title;Advisory URL;Severity;CVE;GHSA;Package Name;Affected Version;Patched Version;Patch;\n"
+        csv = "Title;Advisory URL;" \
+              "Severity;CVE;GHSA;Package Name;" \
+              "Affected Version;Patched Version;Patch;\n"
         for advisory in advisories:
-            csv += f"{advisory['title']};{advisory['advisory_url']};{advisory['severity']};{advisory['cve_id']};{advisory['ghsa_id']};{advisory['package_name']};{advisory['affected']};{advisory['patched']};{advisory['patch']};\n"
+            csv += f"{advisory['title']};" \
+                   f"{advisory['advisory_url']};" \
+                   f"{advisory['severity']};" \
+                   f"{advisory['cve_id']};" \
+                   f"{advisory['ghsa_id']};" \
+                   f"{advisory['package_name']};" \
+                   f"{advisory['affected']};" \
+                   f"{advisory['patched']};" \
+                   f"{advisory['patch']};\n"
 
         # Формируем csv-файл и отдаем на скачивание
-        with open("advisories.csv", "w") as file:
+        with open("advisories.csv", "w", encoding="UTF-8") as file:
             file.write(csv)
 
         return csv

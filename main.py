@@ -1,3 +1,4 @@
+""" Main file to run the program. """
 from classes.Parser import Parser
 
 if __name__ == "__main__":
