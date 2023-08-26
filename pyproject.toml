@@ -12,6 +12,7 @@ requests = "*"
 bs4 = "*"
 beautifulsoup4 = "*"
 lxml = "*"
+black = "*"
 
 
 [build-system]
