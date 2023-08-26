@@ -11,9 +11,7 @@ class Parser:
         self.pages_total = self.get_count_pages()
 
     def get_count_pages(self):
-        self.pages_total = int(
-            self.soup.find("div", class_="pagination").find_all("a")[-2].text
-        )
+        self.pages_total = int(self.soup.find("div", class_="pagination").find_all("a")[-2].text)
         return self.pages_total
 
     def get_advisories(self):
@@ -32,13 +30,9 @@ class Parser:
                 advisory_title = advisory.find("a", class_="Link--primary")
                 advisory_span = advisory.find("span", class_="Label")
 
-                detail_response = requests.get(
-                    "https://github.com" + advisory_title.get("href")
-                )
+                detail_response = requests.get("https://github.com" + advisory_title.get("href"))
                 detail_soup = BeautifulSoup(detail_response.text, "lxml")
-                discussion_sidebar = detail_soup.find_all(
-                    "div", class_="discussion-sidebar-item"
-                )
+                discussion_sidebar = detail_soup.find_all("div", class_="discussion-sidebar-item")
                 for sidebar in discussion_sidebar:
                     sidebar_title = sidebar.find("h3")
 
@@ -64,9 +58,7 @@ class Parser:
                     if header_subblocks:
                         package_name = (
                             header_subblocks[0]
-                            .find(
-                                "span", class_=["f4", "color-fg-default", "text-bold"]
-                            )
+                            .find("span", class_=["f4", "color-fg-default", "text-bold"])
                             .text
                         )
                         affected_version_array = header_subblocks[1].find_all(
@@ -105,9 +97,7 @@ class Parser:
                         )
 
                 arr_advisory = {
-                    "title": advisory_title.text.replace(
-                        "\n                      ", ""
-                    ).strip(),
+                    "title": advisory_title.text.replace("\n                      ", "").strip(),
                     "advisory_url": "https://github.com" + advisory_title.get("href"),
                     "severity": advisory_span.text.strip(),
                     "cve_id": cve_id,
